@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-
-import '../change_name_card.dart';
+// import 'package:awesomeapp/drawer.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+// import '../change_name_card.dart';
 import '../drawer.dart';
-
 
 class HomePage extends StatefulWidget {
   @override
@@ -10,12 +11,23 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  TextEditingController _nameController = TextEditingController();
+  // TextEditingController _nameController = TextEditingController();
   var myText = "Login";
+  var url = "https://jsonplaceholder.typicode.com/photos";
+  var data;
 
   @override
   void initState() {
     super.initState();
+    getData();
+  }
+
+  getData() async {
+    var res = await http.get(url);
+    data = jsonDecode(res.body);
+    print(res.body);
+    setState(() {});
+    print(data);
   }
 
   Widget build(BuildContext context) {
@@ -26,11 +38,23 @@ class _HomePageState extends State<HomePage> {
       ),
       body: Padding(
         padding: const EdgeInsets.all(5.0),
-        child: SingleChildScrollView(
-          child: Card(
-            child: ChangeNameCard(myText: myText, nameController: _nameController),
-          ),
-        ),
+        child: data != null
+            ? ListView.builder(
+                // for grid view
+                // gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                //     crossAxisCount: 3),
+                itemBuilder: (context, index) {
+                  return ListTile(
+                    subtitle: Text("ID: ${data[index]["id"]}"),
+                    title: Text(data[index]["title"]),
+                    leading: Image.network(data[index]["url"]),
+                  );
+                },
+                itemCount: data.length,
+              )
+            : Center(
+                child: CircularProgressIndicator(),
+              ),
       ),
       drawer: MyDrawer(),
 //        floatingActionButtonAnimator: FloatingActionButtonAnimator.scaling,
