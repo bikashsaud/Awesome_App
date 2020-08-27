@@ -17,4 +17,3 @@ void main() {
     theme: ThemeData(primarySwatch: Colors.purple),
   ));
 }
-
